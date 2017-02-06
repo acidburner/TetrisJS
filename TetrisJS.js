@@ -1,4 +1,5 @@
 var Piece = {
+    //todo: reformat style as name isn't needed.
     "square": {
         "name": "square",
         "mapping": [
@@ -58,10 +59,12 @@ var Piece = {
     },
 
     "rotateClockwise": function() {
-
+        //stub
+        console.log("rotate clockwise");
     },
     "rotateCounterClockwise": function() {
-
+        //stub
+        console.log("rotate counter clockwise");
     },
 }
 
@@ -123,7 +126,7 @@ class Render {
         }
     }
 
-    //draws shape at x,y offset by yi,xk of shape
+    //draws shape at x,y offset by y+i,x+k of shape
     // drawShape( shape, x, y ) {
     //     for( var i = 0; i < shape.mapping.length; i++ ) {
     //         for( var k = 0; k < shape.mapping.length; k++ ) {
@@ -140,19 +143,54 @@ class TetrisJS {
         console.log("creating new tetris game");
         this.FRAMES_PER_SECOND = 5;
         this.UPDATE_FREQUENCY = 1000;
-        
+        this.START_LOCATION = {
+            "x": 7,
+            "y": 0
+        }
+
         this.grid = new Grid();
         this.render = new Render();
+        this.piece = {
+            "location": {
+                "x": 7,
+                "y": 0
+            },
+            "block": Piece.getRandom()
+        }
         
         //setInterval( this.updateLoop, this.UPDATE_FREQUENCY / this.FRAMES_PER_SECOND );
     }
 
     updateLoop(){
+        //move piece down 1 unit
+        this.dropPiece();
         //check move
-        //check hit detection
+            //check hit detection, if( [i++][k] == 1 ), stop piece, else continue
+            //check for valid move/game over
         //update screen
         this.render.drawGrid( this.grid );
         //check full row
         //update score
+        //if piece can't drop vertically, get new piece
+        //this.getNewPiece();
+    }
+
+    dropPiece() {
+        this.piece_location.y++;
+    }
+
+    getNewPiece() {
+        this.piece.location = this.START_LOCATION;
+        this.piece.block = Piece.getRandom();
+    }
+
+    updateGrid( grid, piece ) {
+        for( i = 0; i < grid.NUM_COLS; i++ ) {
+            for( k = 0; k < grid.NUM_ROWS; k++ ) {
+
+                //not sure how to do this
+                // grid[piece.y][piece.x] = 1
+            }
+        }
     }
 }
