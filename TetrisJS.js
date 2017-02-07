@@ -5,8 +5,8 @@ var Piece = {
         "color": "green",
         "mapping": [
             ["0", "0", "0", "0"],
-            ["0", "1", "1", "0"],
-            ["0", "1", "1", "0"],
+            ["0", "X", "X", "0"],
+            ["0", "X", "X", "0"],
             ["0", "0", "0", "0"]
         ]
     },
@@ -14,18 +14,18 @@ var Piece = {
         "name": "line",
         "color": "red",
         "mapping": [
-            ["1", "0", "0", "0"],
-            ["1", "0", "0", "0"],
-            ["1", "0", "0", "0"],
-            ["1", "0", "0", "0"]
+            ["X", "0", "0", "0"],
+            ["X", "0", "0", "0"],
+            ["X", "0", "0", "0"],
+            ["X", "0", "0", "0"]
         ]
     },
     "t": {
         "name": "t",
         "color": "yellow",
         "mapping": [
-            ["0", "1", "0", "0"],
-            ["1", "1", "1", "0"],
+            ["0", "X", "0", "0"],
+            ["X", "X", "X", "0"],
             ["0", "0", "0", "0"],
             ["0", "0", "0", "0"]
         ]
@@ -34,8 +34,8 @@ var Piece = {
         "name": "z",
         "color": "violet",
         "mapping": [
-            ["1", "1", "0", "0"],
-            ["0", "1", "1", "0"],
+            ["X", "X", "0", "0"],
+            ["0", "X", "X", "0"],
             ["0", "0", "0", "0"],
             ["0", "0", "0", "0"]
         ]
@@ -44,8 +44,8 @@ var Piece = {
         "name": "reverseZ",
         "color": "indigo",
         "mapping": [
-            ["0", "1", "1", "0"],
-            ["1", "1", "0", "0"],
+            ["0", "X", "X", "0"],
+            ["X", "X", "0", "0"],
             ["0", "0", "0", "0"],
             ["0", "0", "0", "0"]
         ]
@@ -54,9 +54,9 @@ var Piece = {
         "name": "L",
         "color": "blue",
         "mapping": [
-            ["1", "0", "0", "0"],
-            ["1", "0", "0", "0"],
-            ["1", "1", "0", "0"],
+            ["X", "0", "0", "0"],
+            ["X", "0", "0", "0"],
+            ["X", "X", "0", "0"],
             ["0", "0", "0", "0"]
         ]
     },
@@ -64,9 +64,9 @@ var Piece = {
         "name": "reverseL",
         "color": "lightblue",
         "mapping": [
-            ["0", "1", "0", "0"],
-            ["0", "1", "0", "0"],
-            ["1", "1", "0", "0"],
+            ["0", "X", "0", "0"],
+            ["0", "X", "0", "0"],
+            ["X", "X", "0", "0"],
             ["0", "0", "0", "0"]
         ]
     },
@@ -107,6 +107,7 @@ class Grid {
         this.NUM_COLS = 15;
         this.NUM_ROWS = 30;
         this.map = this.makeGrid( this.NUM_ROWS, this.NUM_COLS );
+        this.moveGrid = this.makeGrid( this.NUM_ROWS, this.NUM_COLS );
     }
 
     makeGrid( NUM_ROWS, NUM_COLS ){
@@ -121,6 +122,34 @@ class Grid {
         }
         console.log("made grid: ", grid);
         return grid;
+    }
+
+    clearGrid( grid ) {
+        for( var y = 0; y < this.NUM_COLS; y++ ) {
+            for( var x = 0; x < this.NUM_ROWS; x++ ) {
+                grid[y][x] = 0;
+            }
+        }
+        return grid;
+    }
+
+    addPieceToGrid( grid, piece ) {
+        this.clearMoveGrid();
+        for( var i = 0; i < 4; i++ ) {
+            for( var k = 0; l < 4; k++ ) {
+                grid[piece.location.y+i][piece.location.x+k] = piece.block[i][k];
+            }
+        }
+        return grid;
+    }
+
+    static updateGrid( ) {
+        for( var y = 0; y < this.NUM_COLS; y++ ) {
+            for( var x = 0; x < this.NUM_ROWS; x++ ) {
+                this.map[y][x] = this.moveGrid[y][x];
+            }
+            
+        }
     }
 }
 
@@ -149,6 +178,24 @@ class Render {
         this.canvasContext.clearRect( x * this.TILE_SIZE - 1, y * this.TILE_SIZE - 1, this.TILE_SIZE + 2, this.TILE_SIZE + 2 );
     }
 
+    clearPiece( piece ) {
+        for( var i = 0; i < piece.block.mapping.length; i++ ) {
+            for( var k = 0; k < piece.block.mapping.length; k++ ) {
+                this.clearTile( piece.location.x, pice.location.y );
+            }
+        }
+    }
+
+    clearRow( row ) {
+        for( var y = 0; y < grid.NUM_COLS; y++ ) {
+            if( row == y ) {
+                for( var x = 0; x < grid.NUM_ROWS; x++ ) {
+                    this.clearTile( x, y );
+                }
+            }
+        }
+    }
+
     clearAllTiles( grid ) {
         for( var y = 0; y < grid.NUM_COLS; y++ ) {
             for( var x = 0; x < grid.NUM_ROWS; x++ ) {
@@ -160,11 +207,11 @@ class Render {
     drawGrid( grid, piece ) {
         for( var y = 0; y < grid.NUM_COLS; y++ ) {
             for( var x = 0; x < grid.NUM_ROWS; x++ ) {
-                if( grid[y][x] === 1 ) {
+                if( grid.map[y][x] === "X" ) {
                     this.drawTile( x, y, piece.block.color );
                 }
-                if( grid[y][x] === 2 ) {
-                    this.drawTile( x, y, "black" );
+                if( grid.map[y][x] === 1 ) {
+                    this.drawTile( x, y, piece.block.color );
                 }
             }
         }
@@ -174,7 +221,7 @@ class Render {
     drawShape( shape, x, y ) {
         for( var i = 0; i < shape.mapping.length; i++ ) {
             for( var k = 0; k < shape.mapping.length; k++ ) {
-                if( shape.mapping[i][k] === "1" ) {
+                if( shape.mapping[i][k] === "X" ) {
                     this.drawTile( x + k, y + i, shape.color );
                 }
             }
@@ -191,71 +238,41 @@ class Render {
     }
 }
 
-class Move {
-    constructor(){
-        this.grid = new Grid();
-    }
-
-    clearMoveGrid() {
-        for( var y = 0; y < this.grid.NUM_COLS; y++ ) {
-            for( var x = 0; x < this.grid.NUM_ROWS; x++ ) {
-                this.grid[y][x] = 0;
-            }
-        }
-    }
-
-    drawPiece( grid, piece ) {
-        this.clearMoveGrid();
-        for( var i = 0; i < 4; i++ ) {
-            for( var k = 0; l < 4; k++ ) {
-                grid[piece.location.y+i][piece.location.x+k] = piece.block[i][k];
-            }
-        }
-        return grid;
-    }
-
-    // dropPiece( piece ) {
-    //     return piece.location.y++;
-    // }
+class Points {
 
 
-    //todo: move handlers   
 }
 
 class TetrisJS {
     constructor() {
         console.log("creating new tetris game");
         this.PLACED_TILE = 2;
-        this.FRAMES_PER_SECOND = 5;
-        this.UPDATE_FREQUENCY = 1000;
+        this.FRAMES_PER_SECOND = 1;
+        this.UPDATE_FREQUENCY = 1000; //milliseconds
         this.START_LOCATION = {
             "x": 7,
             "y": 0
         }
 
         this.grid = new Grid();
-        this.moveGrid = new Move();
         this.render = new Render();
+        
         this.piece = {
-            "location": {
-                "x": 7,
-                "y": 0
-            },
+            "location": this.START_LOCATION,
             "block": Piece.getRandom()
         }
-        
+        window.addEventListener( "keypress", this.handleKeypress );
         //setInterval( this.updateLoop, this.UPDATE_FREQUENCY / this.FRAMES_PER_SECOND );
     }
 
     updateLoop(){
         //move piece down 1 unit
-        this.dropPiece();
+        //this.dropPiece();
         //check move
             //check hit detection, if( [i++][k] == 1 ), stop piece, else continue
             //check for valid move/game over
         //update screen
-        this.render.drawGrid( this.grid );
-        //check full row
+        //this.render.drawGrid( this.grid, this.piece );
         //update score
         //if piece can't drop vertically, get new piece
         //this.getNewPiece();
@@ -263,9 +280,13 @@ class TetrisJS {
 
     
 
-    getNewPiece() {
+    createNewPiece() {
         this.piece.location = this.START_LOCATION;
         this.piece.block = Piece.getRandom();
+    }
+
+    dropPiece() {
+        this.piece.location.y++;
     }
 
     // updateGrid( grid, piece ) {
@@ -278,5 +299,31 @@ class TetrisJS {
     //     }
     // }
 
-    
+    checkRow( grid ) {
+        for( var y = 0; y < grid.NUM_COLS; y++ ) {
+            var total = 0;
+            for( var x = 0; x < grid.NUM_ROWS; x++ ) {
+                total += grid.mapping[y][x];
+            }
+            if( total >= grid.NUM_ROWS ) {
+                //add Points
+                //clear row
+            }
+        }
+    }
+
+    handleKeypress( event ) {
+        switch( event.key ) {
+            case "s":
+                this.dropPiece();
+                console.log("down");
+                break;
+            case "a":
+                console.log("left");
+                break;
+            case "d":
+                console.log("right");
+                break;   
+        }
+    }
 }
