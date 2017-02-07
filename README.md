@@ -5,6 +5,8 @@ simple and quick Tetris style game using JS, arrays, and canvas
 
 nothing works quite yet. 
 
-console commands: 
+console commands:
+
 tetris.render.drawAllShapes();
+
 tetris.render.clearAllTiles( tetris.grid );
