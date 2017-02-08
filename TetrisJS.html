@@ -1,12 +1,14 @@
 <html>
     <head>
-        <script src="TetrisJS.js"></script>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/mathjs/3.9.0/math.min.js"></script>
+        <script src="TetrisJS.js"></script>
     </head>
     <body>
         <canvas id="tetrisJS" width="300" height="600" style="border: 1px solid black">
-
         </canvas>
+        <button id='new'>New Game</button>
+        <button id='pause'>Pause Game</button>
+        <button id='resume'>Resume Game</button>
         <script>
             var tetris = new TetrisJS();
         </script>
